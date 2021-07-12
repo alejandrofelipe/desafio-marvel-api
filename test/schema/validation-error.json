@@ -1,0 +1,36 @@
+{
+	"type": "object",
+	"properties": {
+		"errors": {
+			"type": "array",
+			"items": [
+				{
+					"type": "object",
+					"properties": {
+						"value": {
+							"type": "string"
+						},
+						"msg": {
+							"type": "string"
+						},
+						"param": {
+							"type": "string"
+						},
+						"location": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"value",
+						"msg",
+						"param",
+						"location"
+					]
+				}
+			]
+		}
+	},
+	"required": [
+		"errors"
+	]
+}

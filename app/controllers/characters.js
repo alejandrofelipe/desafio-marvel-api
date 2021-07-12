@@ -10,6 +10,9 @@ module.exports = {
 			sqlQuery.where({name: filter.name});
 		if (filter?.nameStartsWith)
 			sqlQuery.where('name', 'like', `${filter.name}%`);
+		if(filter?.modifiedSince)
+			sqlQuery.where('modified', '>', filter?.modifiedSince);
+
 		if (filter?.limit)
 			sqlQuery.limit(filter.limit);
 		if (filter?.offset)

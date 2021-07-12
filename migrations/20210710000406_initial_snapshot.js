@@ -10,6 +10,7 @@ exports.up = knex => {
 			table.increments('id');
 			table.string('title');
 			table.string('description');
+			table.integer('issueNumber');
 			table.timestamp('modified');
 		})
 		.createTable('events', table => {
@@ -31,7 +32,27 @@ exports.up = knex => {
 			table.string('title');
 			table.string('description');
 			table.timestamp('modified');
-		});
+		})
+		.createTable('characters_comics', table => {
+			table.increments('id');
+			table.string('character_id');
+			table.string('comic_id');
+		})
+		.createTable('characters_stories', table => {
+			table.increments('id');
+			table.string('character_id');
+			table.string('story_id');
+		})
+		.createTable('characters_series', table => {
+			table.increments('id');
+			table.string('character_id');
+			table.string('serie_id');
+		})
+		.createTable('characters_events', table => {
+			table.increments('id');
+			table.string('character_id');
+			table.string('event_id');
+		})
 };
 
 exports.down = knex => {
