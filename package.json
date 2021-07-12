@@ -17,16 +17,14 @@
     "test": "jest --detectOpenHandles ./test"
   },
   "dependencies": {
-    "axios": "^0.21.1",
-    "express": "^4.17.1",
-    "express-validator": "^6.12.0",
-    "jest": "^27.0.6",
-    "jest-json-schema": "^5.0.0",
-    "knex": "^0.95.6",
-    "mongodb-memory-server": "^7.2.0",
-    "mongoose": "^5.13.2",
-    "objection": "^2.2.15",
-    "sqlite3": "^5.0.2",
-    "string-template": "^1.0.0"
+    "axios": "0.21.1",
+    "express": "4.17.1",
+    "express-validator": "6.12.0",
+    "jest": "27.0.6",
+    "jest-json-schema": "5.0.0",
+    "knex": "0.95.7",
+    "objection": "2.2.15",
+    "sqlite3": "5.0.2",
+    "string-template": "1.0.0"
   }
 }
