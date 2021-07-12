@@ -25,6 +25,7 @@
     "knex": "^0.95.6",
     "mongodb-memory-server": "^7.2.0",
     "mongoose": "^5.13.2",
+    "objection": "^2.2.15",
     "sqlite3": "^5.0.2",
     "string-template": "^1.0.0"
   }

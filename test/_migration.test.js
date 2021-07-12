@@ -1,17 +1,17 @@
-const MemoryDatabase = require('../app/datasource/MemoryDatabase');
+const Database = require('../app/datasource/MemoryDatabase');
+const Character = require('../app/models/Character');
 
 describe('Migração', () => {
-	const conn = MemoryDatabase.getConnection();
 	it('Incialmente não deve possuir tabelas', async () => {
-		const tables = await conn.raw(`SELECT name FROM sqlite_master 
+		const tables = await Database.getConnection().raw(`SELECT name FROM sqlite_master 
             WHERE type ='table' AND  name NOT LIKE 'sqlite_%';`);
 		expect(tables?.length).toBe(0);
 	});
 
 	it('Deve criar todas as tabelas.', async () => {
 		const expected = ['characters', 'comics', 'events', 'series', 'stories'];
-		await conn.migrate.latest();
-		const tables = await conn.raw(`SELECT name FROM sqlite_master 
+		await Database.getConnection().migrate.latest();
+		const tables = await Database.getConnection().raw(`SELECT name FROM sqlite_master 
             WHERE type ='table' AND  name NOT LIKE 'sqlite_%';`);
 
 		expect(tables?.length).not.toBe(0);
@@ -20,12 +20,13 @@ describe('Migração', () => {
 	});
 
 	it('Deve inserir dados iniciais na tabela', async () => {
-		await conn.seed.run();
-		const chars = await conn.select('*').from('characters');
-		expect(chars).not.toBe(0);
+		await Database.getConnection().seed.run();
+		const chars = await Character.query();
+		expect(chars.length).toBe(3);
+
 	})
 
 	afterAll(() => {
-		conn.destroy();
+		Database.getConnection().destroy();
 	});
 });

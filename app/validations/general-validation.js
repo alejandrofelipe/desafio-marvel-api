@@ -8,16 +8,19 @@ module.exports = {
 		.optional({nullable: false})
 		.notEmpty().bail()
 		.isString().withMessage(messages.INVALIDO).bail(),
-	modified: query(['name', 'nameStartsWith'])
+	modified: query('modifiedSince')
 		.optional({nullable: false})
-		.notEmpty().bail()
-		.isString().withMessage(messages.INVALIDO).bail(),
+		.isISO8601().bail(),
 	limit: query('limit')
 		.optional()
 		.notEmpty().bail()
 		.isInt().withMessage(messages.INVALIDO).bail()
 		.custom(intGte(1)).bail()
 		.custom(intLte(100)).bail(),
+	offset: query('offset')
+		.optional()
+		.notEmpty().bail()
+		.isInt().withMessage(messages.INVALIDO).bail(),
 	orderBy: query('orderBy')
 		.optional()
 		.notEmpty().bail()

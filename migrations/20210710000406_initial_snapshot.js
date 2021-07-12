@@ -35,23 +35,31 @@ exports.up = knex => {
 		})
 		.createTable('characters_comics', table => {
 			table.increments('id');
-			table.string('character_id');
-			table.string('comic_id');
+			table.integer('character_id');
+			table.integer('comic_id');
+
+			table.foreign('character_id')
+				.references('id')
+				.inTable('characters');
+
+			table.foreign('comic_id')
+				.references('id')
+				.inTable('comics');
 		})
 		.createTable('characters_stories', table => {
 			table.increments('id');
-			table.string('character_id');
-			table.string('story_id');
+			table.integer('character_id');
+			table.integer('story_id');
 		})
 		.createTable('characters_series', table => {
 			table.increments('id');
-			table.string('character_id');
-			table.string('serie_id');
+			table.integer('character_id');
+			table.integer('serie_id');
 		})
 		.createTable('characters_events', table => {
 			table.increments('id');
-			table.string('character_id');
-			table.string('event_id');
+			table.integer('character_id');
+			table.integer('event_id');
 		})
 };
 
@@ -61,5 +69,9 @@ exports.down = knex => {
 		.dropTable('comics')
 		.dropTable('events')
 		.dropTable('series')
-		.dropTable('stories');
+		.dropTable('stories')
+		.dropTable('characters_comics')
+		.dropTable('characters_stories')
+		.dropTable('characters_series')
+		.dropTable('characters_events');
 };

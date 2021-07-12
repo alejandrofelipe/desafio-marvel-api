@@ -2,7 +2,7 @@ const axios = require('axios');
 const {matchers} = require('jest-json-schema');
 
 const server = require('../app/server');
-const schemaComic = require('./schema/comic.json');
+const {jsonSchema: schemaComic} = require('../app/models/Comic');
 const schemaErrorValidation = require('./schema/validation-error.json');
 
 expect.extend(matchers);

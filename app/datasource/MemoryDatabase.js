@@ -13,6 +13,7 @@ module.exports = class MemoryDatabase {
 		const conn = this.getConnection();
 		await conn.migrate.latest();
 		await conn.seed.run();
+		return conn;
 	}
 
 	static async close() {
