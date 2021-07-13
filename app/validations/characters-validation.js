@@ -1,27 +1,73 @@
 const {query, param} = require('express-validator');
 
-const messages = require('../messages');
-const {name, modified, limit, orderBy, offset} = require('./general-validation');
+const {name, title, modified, limit, buildOrderBy, offset} = require('./_general-validation');
 const validationHandler = require('./_validation-request-handler');
+
+const paramCharacterId = param(['characterId'])
+	.notEmpty()
+	.isInt().bail()
+	.toInt();
 
 module.exports = {
 	list: [
 		query(['comics', 'series', 'events', 'stories'])
 			.optional()
 			.notEmpty().bail()
-			.isInt().withMessage(messages.INVALIDO).bail()
-			.matches(/[0-9]+((;[0-9]+)?)+/gm).bail(),
+			.trim().isString().bail()
+			.matches(/^[0-9]+(;[0-9]+)*$/is).bail(),
 		name,
 		modified,
 		limit,
 		offset,
-		orderBy,
+		buildOrderBy(['name', 'modified']),
 		validationHandler
 	],
 	get: [
-		param(['characterId'])
-			.notEmpty()
-			.isInt().withMessage(messages.INVALIDO).bail(),
+		paramCharacterId,
+		validationHandler
+	],
+	getComics: [
+		paramCharacterId,
+		query('issueNumber')
+			.optional()
+			.notEmpty().bail()
+			.isInt().bail().toInt(),
+		title,
+		modified,
+		limit,
+		offset,
+		buildOrderBy(['title', 'issueNumber', 'modified']),
+		validationHandler
+	],
+	getEvents: [
+		paramCharacterId,
+		title,
+		modified,
+		limit,
+		offset,
+		buildOrderBy(['title', 'modified']),
+		validationHandler
+	],
+	getSeries: [
+		paramCharacterId,
+		query(['startYear', 'endYear'])
+			.optional()
+			.notEmpty().bail()
+			.isInt().bail().toInt(),
+		title,
+		modified,
+		limit,
+		offset,
+		buildOrderBy(['title', 'modified', 'startYear']),
+		validationHandler
+	],
+	getStories: [
+		paramCharacterId,
+		title,
+		modified,
+		limit,
+		offset,
+		buildOrderBy(['title', 'modified']),
 		validationHandler
 	]
 }

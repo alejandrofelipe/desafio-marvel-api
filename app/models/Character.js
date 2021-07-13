@@ -4,8 +4,12 @@ const Database = require('../datasource/MemoryDatabase');
 Model.knex(Database.getConnection());
 
 class Character extends Model {
-	static get tableName() {
+	static tableName() {
 		return 'characters';
+	}
+
+	static get idColumn() {
+		return 'id';
 	}
 
 	static get jsonSchema() {
@@ -36,12 +40,11 @@ class Character extends Model {
 		}
 	}
 
-	static get relationMapping() {
-		const Comic = require('./Comic');
+	static relationMappings() {
 		return {
 			comics: {
 				relation: Model.ManyToManyRelation,
-				modelClass: Comic,
+				modelClass: `${__dirname}/Comic`,
 				join: {
 					from: 'characters.id',
 					to: 'comics.id',
@@ -50,7 +53,44 @@ class Character extends Model {
 						to: 'characters_comics.comic_id'
 					}
 				}
+			},
+			events: {
+				relation: Model.ManyToManyRelation,
+				modelClass: `${__dirname}/Event`,
+				join: {
+					from: 'characters.id',
+					to: 'events.id',
+					through: {
+						from: 'characters_events.character_id',
+						to: 'characters_events.event_id'
+					}
+				}
+			},
+			series: {
+				relation: Model.ManyToManyRelation,
+				modelClass: `${__dirname}/Serie`,
+				join: {
+					from: 'characters.id',
+					to: 'series.id',
+					through: {
+						from: 'characters_series.character_id',
+						to: 'characters_series.serie_id'
+					}
+				}
+			},
+			stories: {
+				relation: Model.ManyToManyRelation,
+				modelClass: `${__dirname}/Story`,
+				join: {
+					from: 'characters.id',
+					to: 'stories.id',
+					through: {
+						from: 'characters_stories.character_id',
+						to: 'characters_stories.story_id'
+					}
+				}
 			}
+
 		}
 	}
 }

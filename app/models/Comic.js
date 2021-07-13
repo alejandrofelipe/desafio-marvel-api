@@ -4,8 +4,12 @@ const Database = require('../datasource/MemoryDatabase');
 Model.knex(Database.getConnection());
 
 class Comic extends Model {
-	static get tableName() {
+	static tableName() {
 		return 'comics';
+	}
+
+	static get idColumn() {
+		return 'id';
 	}
 
 	static get jsonSchema() {
@@ -16,24 +20,44 @@ class Comic extends Model {
 				id: {
 					type: "integer"
 				},
-				name: {
+				title: {
 					type: "string"
 				},
 				description: {
 					type: "string"
 				},
+				issueNumber: {
+					type: "integer"
+				},
 				modified: {
-					type: "string",
-					format: "date"
+					type: "string"
 				}
 			},
-			required: [
+			"required": [
 				"id",
-				"name",
+				"title",
 				"description",
+				"issueNumber",
 				"modified"
 			]
 		};
+	}
+
+	static relationMappings() {
+		return {
+			characters: {
+				relation: Model.ManyToManyRelation,
+				modelClass: `${__dirname}/Character`,
+				join: {
+					from: 'comics.id',
+					to: 'characters.id',
+					through: {
+						from: 'characters_comics.comic_id',
+						to: 'characters_comics.character_id'
+					}
+				}
+			}
+		}
 	}
 }
 

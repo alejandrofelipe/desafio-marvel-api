@@ -8,6 +8,10 @@ class Event extends Model {
 		return 'events';
 	}
 
+	static get idColumn() {
+		return 'id';
+	}
+
 	static get jsonSchema() {
 		return {
 			type: "object",
@@ -16,7 +20,7 @@ class Event extends Model {
 				id: {
 					type: "integer"
 				},
-				name: {
+				title: {
 					type: "string"
 				},
 				description: {
@@ -29,11 +33,28 @@ class Event extends Model {
 			},
 			required: [
 				"id",
-				"name",
+				"title",
 				"description",
 				"modified"
 			]
 		};
+	}
+
+	static relationMappings() {
+		return {
+			characters: {
+				relation: Model.ManyToManyRelation,
+				modelClass: `${__dirname}/Character`,
+				join: {
+					from: 'events.id',
+					to: 'characters.id',
+					through: {
+						from: 'characters_events.event_id',
+						to: 'characters_events.character_id'
+					}
+				}
+			}
+		}
 	}
 }
 

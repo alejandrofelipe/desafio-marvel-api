@@ -1,41 +1,45 @@
-const axios = require('axios');
+// const axios = require('axios');
+const request = require('supertest');
 const {matchers} = require('jest-json-schema');
 
-const server = require('../app/server');
+const app = require('../app');
+const Database = require('../app/datasource/MemoryDatabase');
 const {jsonSchema: schemaCharacter} = require('../app/models/Character');
 const schemaErrorValidation = require('./schema/validation-error.json');
 
 expect.extend(matchers);
 
-const apiPath = '/v1/public/characters';
-const url_base = `http://${server.host}:${server.port}`;
-const axiosInstance = axios.create({
-	baseURL: `${url_base}${apiPath}`,
-	validateStatus: null
-})
-
 describe(`path => /v1/public/characters/{characterId}`, () => {
+	const basePath = '/v1/public/characters';
 
 	beforeAll(async () => {
-		return await server.start();
+		await Database.init();
 	});
 
-	afterAll(() => {
-		server.close();
+	afterAll(async () => {
+		await Database.close();
 	});
 
 	it('should return a single character', async () => {
-		const id = 2;
-		const {data, status} = await axiosInstance.get(`${url_base}${apiPath}/${id}`);
+		const characterId = 2;
+		const {status, body} = await request(app).get(`${basePath}/${characterId}`);
 		expect(status).toBe(200);
-		expect(data).toMatchSchema(schemaCharacter)
-		expect(data.id).toBe(id);
+		expect(body).toMatchSchema(schemaCharacter)
+		expect(body.id).toBe(characterId);
+	});
+
+	it('should return a not found error', async () => {
+		const characterId = 99999;
+		const {status, body} = await request(app).get(`${basePath}/${characterId}`);
+		console.log(body);
+		expect(status).toBe(404);
+		expect(body).toMatchSchema(schemaErrorValidation)
 	});
 
 	it('should return error', async () => {
-		const id = 'ID';
-		const {data, status} = await axiosInstance.get(`${url_base}${apiPath}/${id}`);
+		const characterId = 'ID';
+		const {status, body} = await request(app).get(`${basePath}/${characterId}`);
 		expect(status).toBe(400);
-		expect(data).toMatchSchema(schemaErrorValidation);
+		expect(body).toMatchSchema(schemaErrorValidation);
 	});
 })

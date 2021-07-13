@@ -1,67 +1,80 @@
-const axios = require('axios');
+const request = require('supertest');
 const {matchers} = require('jest-json-schema');
 
-const server = require('../app/server');
+const app = require('../app');
+const Database = require('../app/datasource/MemoryDatabase');
 const {jsonSchema: schemaComic} = require('../app/models/Comic');
 const schemaErrorValidation = require('./schema/validation-error.json');
 
 expect.extend(matchers);
 
-const apiPath = '/v1/public/characters';
-const url_base = `http://${server.host}:${server.port}`;
-const axiosInstance = axios.create({
-	baseURL: `${url_base}${apiPath}`,
-	validateStatus: null
-})
-
 describe(`path => /v1/public/characters/{characterId}/comics`, () => {
+	const basePath = '/v1/public/characters';
+
 	beforeAll(async () => {
-		return await server.start();
+		await Database.init();
 	});
 
-	afterAll(() => {
-		server.close();
+	afterAll(async () => {
+		await Database.close();
 	});
 
 	it('should return a list of a character\'s comics', async () => {
-		const {data, status} = await axiosInstance.get('/1/comics');
-		expect(status).toBe(200);
-		expect(Array.isArray(data)).toBe(true);
-		data.map(c => expect(c).toMatchSchema(schemaComic));
+		const characterId = 1;
+		const {status, body} = await request(app).get(`${basePath}/${characterId}/comics`);
+		expect(status).toEqual(200);
+		expect(Array.isArray(body)).toBeTruthy();
+		expect(body).toHaveLength(2);
+		body.map(co => expect(co).toMatchSchema(schemaComic));
+		expect(body.map(co => co.id)).toEqual([1, 4]);
 	});
 
-	it('should return a list of a character\'s comics filtered by name', async () => {
-		const name = 'Mega';
-		const {data, status} = await axiosInstance.get(`/1/comics?name=${name}`);
-		expect(status).toBe(200);
-		data.map(c => expect(c.name).toBe(name))
+	it('should return a list of a character\'s comics filtered by title', async () => {
+		const characterId = 1;
+		const title = 'Comic Reunion';
+		const {status, body} = await request(app).get(`${basePath}/${characterId}/comics?title=${title}`);
+		expect(status).toEqual(200);
+		body.map(c => expect(c.title).toEqual(title))
+	});
+
+	it('should return a list of a character\'s comics filtered by titleStartsWith', async () => {
+		const characterId = 1;
+		const titleStartsWith = 'Comic';
+		const {status, body} = await request(app).get(`${basePath}/${characterId}/comics?titleStartsWith=${titleStartsWith}`);
+		expect(status).toEqual(200);
+		body.map(c => expect(c.title.startsWith(titleStartsWith)).toBeTruthy())
 	});
 
 	it('should return error when filtered by empty field', async () => {
-		const {data, status} = await axiosInstance.get(`/1/comics?name=&nameStartsWith=`);
-		expect(status).toBe(400);
-		expect(data).toMatchSchema(schemaErrorValidation);
-		expect(data.errors.map(e => e.param)).toEqual(['name', 'nameStartsWith']);
+		const characterId = 1;
+		const {status, body} = await request(app).get(`${basePath}/${characterId}/comics?title=&titleStartsWith=`);
+		expect(status).toEqual(400);
+		expect(body).toMatchSchema(schemaErrorValidation);
+		expect(body.errors.map(e => e.param)).toEqual(['title', 'titleStartsWith']);
 	});
 
 	it('should return a list of a character\'s comics filtered by modifiedSince', async () => {
+		const characterId = 1;
 		const modified = '2021-04-01';
-		const {data, status} = await axiosInstance.get(`/1/comics?modifiedSince=${modified}`);
+		const {status, body} = await request(app).get(`${basePath}/${characterId}/comics?modifiedSince=${modified}`);
 		expect(status).toBe(200);
-		data.map(c => expect(c.modified >= modified).toBe(true))
+		expect(body).toHaveLength(1);
+		body.map(c => expect(c.modified >= modified).toBeTruthy())
 	});
 
 	it('should return a list of one comic of a character', async () => {
+		const characterId = 1;
 		const limit = 1;
-		let {data, status} = await axiosInstance.get(`/1/comics?limit=${limit}`);
+		const {status, body} = await request(app).get(`${basePath}/${characterId}/comics?limit=${limit}`);
 		expect(status).toBe(200);
-		expect(data.length).toBe(limit);
+		expect(body).toHaveLength(limit);
 	});
 
 	it('should return a list of a character\'s comics with one comic skiped', async () => {
+		const characterId = 1;
 		const offset = 1;
-		let {data, status} = await axiosInstance.get(`/1/comics?offset=${offset}`);
+		const {status, body} = await request(app).get(`${basePath}/${characterId}/comics?offset=${offset}`);
 		expect(status).toBe(200);
-		expect(data[0]?.id).toBe(4);
+		expect(body[0]?.id).toBe(4);
 	});
 })

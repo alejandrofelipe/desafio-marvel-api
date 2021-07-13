@@ -22,7 +22,7 @@ describe('Migração', () => {
 	it('Deve inserir dados iniciais na tabela', async () => {
 		await Database.getConnection().seed.run();
 		const chars = await Character.query();
-		expect(chars.length).toBe(3);
+		expect(chars.length).toBe(4);
 
 	})
 

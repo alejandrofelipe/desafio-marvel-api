@@ -1,6 +1,22 @@
 {
 	"type": "object",
 	"properties": {
+		"success": {
+			"type": "boolean"
+		},
+		"message": {
+			"type": "string"
+		},
+		"data": {
+			"anyOf": [
+				{
+					"type": "object"
+				},
+				{
+					"type": "null"
+				}
+			]
+		},
 		"errors": {
 			"type": "array",
 			"items": [
@@ -31,6 +47,7 @@
 		}
 	},
 	"required": [
-		"errors"
+		"success",
+		"message"
 	]
 }

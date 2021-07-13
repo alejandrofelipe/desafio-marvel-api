@@ -8,6 +8,10 @@ class Story extends Model {
 		return 'stories';
 	}
 
+	static get idColumn() {
+		return 'id';
+	}
+
 	static get jsonSchema() {
 		return {
 			type: "object",
@@ -16,7 +20,7 @@ class Story extends Model {
 				id: {
 					type: "integer"
 				},
-				name: {
+				title: {
 					type: "string"
 				},
 				description: {
@@ -29,11 +33,28 @@ class Story extends Model {
 			},
 			required: [
 				"id",
-				"name",
+				"title",
 				"description",
 				"modified"
 			]
 		};
+	}
+
+	static get relationMappings() {
+		return {
+			characters: {
+				relation: Model.ManyToManyRelation,
+				modelClass: `${__dirname}/Character`,
+				join: {
+					from: 'stories.id',
+					to: 'characters.id',
+					through: {
+						from: 'characters_stories.story_id',
+						to: 'characters_stories.character_id'
+					}
+				}
+			}
+		}
 	}
 }
 

@@ -8,6 +8,10 @@ class Serie extends Model {
 		return 'series';
 	}
 
+	static get idColumn() {
+		return 'id';
+	}
+
 	static get jsonSchema() {
 		return {
 			type: "object",
@@ -16,7 +20,7 @@ class Serie extends Model {
 				id: {
 					type: "integer"
 				},
-				name: {
+				title: {
 					type: "string"
 				},
 				description: {
@@ -35,13 +39,30 @@ class Serie extends Model {
 			},
 			required: [
 				"id",
-				"name",
+				"title",
 				"description",
 				"startYear",
 				"endYear",
 				"modified"
 			]
 		};
+	}
+
+	static get relationMappings() {
+		return {
+			characters: {
+				relation: Model.ManyToManyRelation,
+				modelClass: `${__dirname}/Character`,
+				join: {
+					from: 'series.id',
+					to: 'characters.id',
+					through: {
+						from: 'characters_series.serie_id',
+						to: 'characters_series.character_id'
+					}
+				}
+			}
+		}
 	}
 }
 
